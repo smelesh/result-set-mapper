@@ -7,7 +7,7 @@ namespace Smelesh\ResultSetMapper\Node;
 /**
  * Single item representation in one-to-one, one-to-many relationships.
  */
-final class EmbeddedItemNode extends RelationalNode
+final class EmbeddedItemNode extends EmbeddedNode
 {
     protected function getResultFromIndex(Index $index): ?array
     {

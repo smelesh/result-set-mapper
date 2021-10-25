@@ -15,7 +15,7 @@ abstract class RelationalNode extends AbstractNode
     private array $primaryKey;
 
     /**
-     * @var array<string, self>
+     * @var array<string, EmbeddedNode>
      */
     private array $relations = [];
 
@@ -38,7 +38,7 @@ abstract class RelationalNode extends AbstractNode
     /**
      * Adds relation to current node.
      */
-    final public function join(string $name, self $node): self
+    final public function join(string $name, EmbeddedNode $node): self
     {
         $this->relations[$name] = $node;
 

@@ -7,6 +7,6 @@ namespace Smelesh\ResultSetMapper\Node;
 /**
  * Collection representation in one-to-many, many-to-many relationships.
  */
-final class EmbeddedCollectionNode extends RelationalNode
+final class EmbeddedCollectionNode extends EmbeddedNode
 {
 }
