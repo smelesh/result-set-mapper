@@ -1,0 +1,24 @@
+{
+    "name": "smelesh/result-set-mapper",
+    "description": "Mapper for relational SQL result set.",
+    "keywords": ["mapper", "result set", "database"],
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Smelesh\\ResultSetMapper\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sergey Melesh",
+            "email": "sergei.melesh@gmail.com"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": "^8.0"
+    }
+}
