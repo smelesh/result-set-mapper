@@ -18,7 +18,7 @@ final class Index
     private array $index = [];
 
     /**
-     * @var array<string, self>
+     * @var array<string, array<string, self>>
      */
     private array $nestedIndexes = [];
 

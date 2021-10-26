@@ -45,6 +45,9 @@ abstract class RelationalNode extends AbstractNode
         return $this;
     }
 
+    /**
+     * @param non-empty-array<string, mixed> $row
+     */
     final protected function parseRelationalRow(array $row, Index $index): void
     {
         $primaryKey = $this->parseDataFromRow($row, $this->primaryKey);
