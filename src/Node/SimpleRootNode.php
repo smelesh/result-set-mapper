@@ -16,6 +16,6 @@ final class SimpleRootNode extends AbstractNode implements RootNode
 
     public function parseRow(array $row): array
     {
-        return $this->parseDataFromRow($row, $this->columns);
+        return $this->parseDataFromRow($row, $this->columns, $this->types);
     }
 }
