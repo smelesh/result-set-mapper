@@ -15,17 +15,24 @@ class ColumnTypeProcessorTest extends TestCase
     {
         $processor = new ColumnTypeProcessor(new SimpleTypeConverter(), [
             'id' => 'int',
+            'subscription.is_active' => 'bool',
+            'payments.id' => 'int',
+            'payments.invoice.amount' => 'float',
             'unknown' => 'int',
         ]);
 
         $result = (new ResultSet([
-            ['id' => 1, 'name' => 'user #1'],
-            ['id' => 2, 'name' => 'user #2'],
+            ['id' => '1', 'name' => 'user #1', 'subscription' => ['id' => 'SUB-1', 'is_active' => '1'], 'payments' => [
+                ['id' => '1000', 'is_active' => '1', 'invoice' => ['id' => 'INVOICE-1', 'amount' => '1.99']],
+            ]],
+            ['id' => '2', 'name' => 'user #2', 'subscription' => null, 'payments' => []],
         ]))->withProcessor($processor);
 
         $this->assertSame([
-            ['id' => 1, 'name' => 'user #1'],
-            ['id' => 2, 'name' => 'user #2'],
+            ['id' => 1, 'name' => 'user #1', 'subscription' => ['id' => 'SUB-1', 'is_active' => true], 'payments' => [
+                ['id' => 1000, 'is_active' => '1', 'invoice' => ['id' => 'INVOICE-1', 'amount' => 1.99]],
+            ]],
+            ['id' => 2, 'name' => 'user #2', 'subscription' => null, 'payments' => []],
         ], $result->fetchAll());
     }
 }
