@@ -18,60 +18,14 @@ class SimpleRootNodeTest extends TestCase
         new SimpleRootNode([]);
     }
 
-    public function testParseRowWithSpecifiedColumns(): void
-    {
-        $node = new SimpleRootNode(['id', 'name']);
-
-        $result = $node->parseRow(['id' => 1, 'name' => 'user #1', 'country' => 'BY']);
-
-        $this->assertSame([
-            'id' => 1,
-            'name' => 'user #1',
-        ], $result);
-    }
-
-    public function testParseRowWithColumnAlias(): void
-    {
-        $node = new SimpleRootNode(['id', 'user_name' => 'name']);
-
-        $result = $node->parseRow(['id' => 1, 'name' => 'user #1']);
-
-        $this->assertSame([
-            'id' => 1,
-            'user_name' => 'user #1',
-        ], $result);
-    }
-
-    public function testParseRowWithUnknownColumn(): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Column "unknown" does not exist in result set');
-
-        $node = new SimpleRootNode(['id', 'unknown']);
-
-        $node->parseRow(['id' => 1, 'name' => 'user #1']);
-    }
-
-    public function testParseNullRow(): void
-    {
-        $node = new SimpleRootNode(['id', 'name']);
-
-        $result = $node->parseRow(['id' => null, 'name' => null]);
-
-        $this->assertSame([
-            'id' => null,
-            'name' => null,
-        ], $result);
-    }
-
     public function testParseRowsWithSpecifiedColumns(): void
     {
         $node = new SimpleRootNode(['id', 'name']);
 
-        $result = $node->parseRows([
+        $result = $node->parseRows(new \ArrayIterator([
             ['id' => 1, 'name' => 'user #1', 'country' => 'BY'],
             ['id' => 2, 'name' => 'user #2', 'country' => 'US'],
-        ]);
+        ]));
 
         $this->assertSame([
             [
@@ -82,17 +36,46 @@ class SimpleRootNodeTest extends TestCase
                 'id' => 2,
                 'name' => 'user #2',
             ],
-        ], $result);
+        ], iterator_to_array($result));
+    }
+
+    public function testParseRowsWithColumnAlias(): void
+    {
+        $node = new SimpleRootNode(['id', 'user_name' => 'name']);
+
+        $result = $node->parseRows(new \ArrayIterator([
+            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 2, 'name' => 'user #2'],
+        ]));
+
+        $this->assertSame([
+            ['id' => 1, 'user_name' => 'user #1'],
+            ['id' => 2, 'user_name' => 'user #2'],
+        ], iterator_to_array($result));
+    }
+
+    public function testParseRowsWithUnknownColumn(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Column "unknown" does not exist in result set');
+
+        $node = new SimpleRootNode(['id', 'unknown']);
+
+        $result = $node->parseRows(new \ArrayIterator([
+            ['id' => 1, 'name' => 'user #1'],
+        ]));
+
+        iterator_to_array($result);
     }
 
     public function testParseRowsWithDuplicates(): void
     {
         $node = new SimpleRootNode(['id', 'name']);
 
-        $result = $node->parseRows([
+        $result = $node->parseRows(new \ArrayIterator([
             ['id' => 1, 'name' => 'user #1'],
             ['id' => 1, 'name' => 'user #1'],
-        ]);
+        ]));
 
         $this->assertSame([
             [
@@ -103,16 +86,29 @@ class SimpleRootNodeTest extends TestCase
                 'id' => 1,
                 'name' => 'user #1',
             ],
-        ], $result);
+        ], iterator_to_array($result));
     }
 
     public function testParseEmptyRowsList(): void
     {
         $node = new SimpleRootNode(['id', 'name']);
 
-        $result = $node->parseRows([]);
+        $result = $node->parseRows(new \ArrayIterator());
 
-        $this->assertEmpty($result);
+        $this->assertEmpty(iterator_to_array($result));
+    }
+
+    public function testParseNullRow(): void
+    {
+        $node = new SimpleRootNode(['id', 'name']);
+
+        $result = $node->parseRows(new \ArrayIterator([
+            ['id' => null, 'name' => null],
+        ]));
+
+        $this->assertSame([
+            ['id' => null, 'name' => null],
+        ], iterator_to_array($result));
     }
 
     public function testParseRowsWithTypes(): void
@@ -123,16 +119,16 @@ class SimpleRootNodeTest extends TestCase
                 'is_active' => 'bool',
             ], new SimpleTypeConverter());
 
-        $result = $node->parseRows([
+        $result = $node->parseRows(new \ArrayIterator([
             ['id' => '1', 'name' => 'user #1', 'is_active' => '1'],
             ['id' => '2', 'name' => 'user #2', 'is_active' => '0'],
             ['id' => '3', 'name' => 'user #3', 'is_active' => null],
-        ]);
+        ]));
 
         $this->assertSame([
             ['id' => 1, 'name' => 'user #1', 'is_active' => true],
             ['id' => 2, 'name' => 'user #2', 'is_active' => false],
             ['id' => 3, 'name' => 'user #3', 'is_active' => null],
-        ], $result);
+        ], iterator_to_array($result));
     }
 }

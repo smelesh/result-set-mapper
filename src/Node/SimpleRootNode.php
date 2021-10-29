@@ -9,13 +9,10 @@ namespace Smelesh\ResultSetMapper\Node;
  */
 final class SimpleRootNode extends AbstractNode implements RootNode
 {
-    public function parseRows(array $rows): array
+    public function parseRows(\Traversable $rows): \Traversable
     {
-        return array_map(fn(array $row) => $this->parseRow($row), $rows);
-    }
-
-    public function parseRow(array $row): array
-    {
-        return $this->parseDataFromRow($row, $this->columns, $this->types);
+        foreach ($rows as $row) {
+            yield $this->parseDataFromRow($row, $this->columns, $this->types);
+        }
     }
 }

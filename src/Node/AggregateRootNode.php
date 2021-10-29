@@ -10,7 +10,7 @@ namespace Smelesh\ResultSetMapper\Node;
  */
 final class AggregateRootNode extends RelationalNode implements RootNode
 {
-    public function parseRows(array $rows): array
+    public function parseRows(\Traversable $rows): \Traversable
     {
         $index = new Index();
 
@@ -18,16 +18,10 @@ final class AggregateRootNode extends RelationalNode implements RootNode
             $this->parseRelationalRow($row, $index);
         }
 
-        return $index->findAll();
-    }
+        $result = $index->findAll();
 
-    public function parseRow(array $row): array
-    {
-        $index = new Index();
+        unset($index);
 
-        $this->parseRelationalRow($row, $index);
-
-        return $index->findFirst()
-            ?? throw new \RuntimeException('Unable to parse a row, got empty result');
+        yield from $result;
     }
 }
