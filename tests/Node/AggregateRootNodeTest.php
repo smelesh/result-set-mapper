@@ -8,7 +8,6 @@ use Smelesh\ResultSetMapper\Node\AggregateRootNode;
 use PHPUnit\Framework\TestCase;
 use Smelesh\ResultSetMapper\Node\EmbeddedCollectionNode;
 use Smelesh\ResultSetMapper\Node\EmbeddedItemNode;
-use Smelesh\ResultSetMapper\Type\SimpleTypeConverter;
 
 class AggregateRootNodeTest extends TestCase
 {
@@ -419,29 +418,6 @@ class AggregateRootNodeTest extends TestCase
                     ['id' => 2001, 'method' => 'PAYPAL', 'discount' => null],
                 ],
             ],
-        ], iterator_to_array($result));
-    }
-
-    public function testParseRowsWithTypes(): void
-    {
-        $node = (new AggregateRootNode(['id', 'name', 'is_active'], ['id']))
-            ->join('subscription', new EmbeddedItemNode(['id' => 'subscription_id', 'type' => 'subscription_type'], ['subscription_id']))
-            ->types([
-                'id' => 'int',
-                'is_active' => 'bool',
-                'subscription_id' => 'int',
-            ], new SimpleTypeConverter());
-
-        $result = $node->parseRows(new \ArrayIterator([
-            ['id' => '1', 'name' => 'user #1', 'is_active' => '1', 'subscription_id' => '101', 'subscription_type' => 'PREMIUM'],
-            ['id' => '2', 'name' => 'user #2', 'is_active' => '0', 'subscription_id' => '201', 'subscription_type' => 'LITE'],
-            ['id' => '3', 'name' => 'user #3', 'is_active' => null, 'subscription_id' => null, 'subscription_type' => null],
-        ]));
-
-        $this->assertSame([
-            ['id' => 1, 'name' => 'user #1', 'is_active' => true, 'subscription' => ['id' => 101, 'type' => 'PREMIUM']],
-            ['id' => 2, 'name' => 'user #2', 'is_active' => false, 'subscription' => ['id' => 201, 'type' => 'LITE']],
-            ['id' => 3, 'name' => 'user #3', 'is_active' => null, 'subscription' => null],
         ], iterator_to_array($result));
     }
 }

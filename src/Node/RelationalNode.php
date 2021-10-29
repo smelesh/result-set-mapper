@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Smelesh\ResultSetMapper\Node;
 
-use Smelesh\ResultSetMapper\Type\TypeConverter;
-
 /**
  * Base node that provides common functionality for relation parsing.
  */
@@ -47,17 +45,6 @@ abstract class RelationalNode extends AbstractNode
         return $this;
     }
 
-    final public function types(array $types, TypeConverter $typeConverter): self
-    {
-        parent::types($types, $typeConverter);
-
-        foreach ($this->relations as $relationNode) {
-            $relationNode->types($types, $typeConverter);
-        }
-
-        return $this;
-    }
-
     /**
      * @param non-empty-array<string, mixed> $row
      */
@@ -70,7 +57,7 @@ abstract class RelationalNode extends AbstractNode
             return;
         }
 
-        $item = $index->find($primaryKey) ?? $this->parseDataFromRow($row, $this->columns, $this->types);
+        $item = $index->find($primaryKey) ?? $this->parseDataFromRow($row, $this->columns);
 
         foreach ($this->relations as $relationName => $relationNode) {
             $relationIndex = $index->nestedIndex($relationName, $primaryKey);

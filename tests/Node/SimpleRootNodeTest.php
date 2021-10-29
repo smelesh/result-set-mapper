@@ -6,7 +6,6 @@ namespace Smelesh\ResultSetMapper\Tests\Node;
 
 use Smelesh\ResultSetMapper\Node\SimpleRootNode;
 use PHPUnit\Framework\TestCase;
-use Smelesh\ResultSetMapper\Type\SimpleTypeConverter;
 
 class SimpleRootNodeTest extends TestCase
 {
@@ -108,27 +107,6 @@ class SimpleRootNodeTest extends TestCase
 
         $this->assertSame([
             ['id' => null, 'name' => null],
-        ], iterator_to_array($result));
-    }
-
-    public function testParseRowsWithTypes(): void
-    {
-        $node = (new SimpleRootNode(['id', 'name', 'is_active']))
-            ->types([
-                'id' => 'int',
-                'is_active' => 'bool',
-            ], new SimpleTypeConverter());
-
-        $result = $node->parseRows(new \ArrayIterator([
-            ['id' => '1', 'name' => 'user #1', 'is_active' => '1'],
-            ['id' => '2', 'name' => 'user #2', 'is_active' => '0'],
-            ['id' => '3', 'name' => 'user #3', 'is_active' => null],
-        ]));
-
-        $this->assertSame([
-            ['id' => 1, 'name' => 'user #1', 'is_active' => true],
-            ['id' => 2, 'name' => 'user #2', 'is_active' => false],
-            ['id' => 3, 'name' => 'user #3', 'is_active' => null],
         ], iterator_to_array($result));
     }
 }
