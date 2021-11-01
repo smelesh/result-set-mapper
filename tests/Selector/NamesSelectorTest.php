@@ -17,6 +17,25 @@ class NamesSelectorTest extends TestCase
         new NamesSelector([]);
     }
 
+    public function testCompile(): void
+    {
+        $selector = new NamesSelector([
+            'id',
+            'user_name' => 'name',
+        ]);
+
+        $compiledSelector = $selector->compile([
+            'id' => 1,
+            'name' => 'user #1',
+            'country' => 'BY',
+        ]);
+
+        $this->assertSame([
+            'id' => 'id',
+            'user_name' => 'name',
+        ], $compiledSelector->getSelectedColumnsMap());
+    }
+
     public function testSelectColumns(): void
     {
         $selector = new NamesSelector([

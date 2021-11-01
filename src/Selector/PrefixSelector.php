@@ -25,24 +25,29 @@ final class PrefixSelector implements Selector
 
     public function apply(array $row): array
     {
-        $result = [];
+        return $this->compile($row)->apply($row);
+    }
+
+    public function compile(array $row): CompiledSelector
+    {
+        $columns = [];
 
         foreach ($row as $name => $value) {
             if (!str_starts_with($name, $this->prefix)) {
                 continue;
             }
 
-            $name = substr($name, strlen($this->prefix));
+            $alias = substr($name, strlen($this->prefix));
 
-            if ($name === '') {
+            if ($alias === '') {
                 continue;
             }
 
-            $name = $this->replaceTo . $name;
+            $alias = $this->replaceTo . $alias;
 
-            $result[$name] = $value;
+            $columns[$alias] = $name;
         }
 
-        return $result;
+        return new CompiledSelector($columns);
     }
 }

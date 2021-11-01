@@ -10,6 +10,13 @@ namespace Smelesh\ResultSetMapper\Selector;
 interface Selector
 {
     /**
+     * Generates optimized selector based on the provided sample row.
+     *
+     * @param array<string, mixed> $row
+     */
+    public function compile(array $row): CompiledSelector;
+
+    /**
      * Applies selector rules to a row and returns matched columns.
      *
      * @param array<string, mixed> $row

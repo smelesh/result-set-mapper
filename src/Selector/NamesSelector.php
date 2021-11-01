@@ -12,7 +12,7 @@ final class NamesSelector implements Selector
     private array $columns;
 
     /**
-     * @param array<string> $columns List of column names parsed by this node.
+     * @param array<string> $columns List of column names to select.
      *                               String keys are used as aliases in a returned result.
      */
     public function __construct(array $columns)
@@ -26,17 +26,12 @@ final class NamesSelector implements Selector
 
     public function apply(array $row): array
     {
-        $result = [];
+        return $this->compile($row)->apply($row);
+    }
 
-        foreach ($this->columns as $alias => $name) {
-            if (!array_key_exists($name, $row)) {
-                throw new \LogicException(sprintf('Column "%s" does not exist', $name));
-            }
-
-            $result[$alias] = $row[$name];
-        }
-
-        return $result;
+    public function compile(array $row): CompiledSelector
+    {
+        return new CompiledSelector($this->columns);
     }
 
     /**

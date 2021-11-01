@@ -17,6 +17,22 @@ class PrefixSelectorTest extends TestCase
         new PrefixSelector('');
     }
 
+    public function testCompile(): void
+    {
+        $selector = new PrefixSelector('subscription_');
+
+        $compiledSelector = $selector->compile([
+            'id' => 1,
+            'subscription_id' => 10,
+            'subscription_type' => 'PREMIUM',
+        ]);
+
+        $this->assertSame([
+            'id' => 'subscription_id',
+            'type' => 'subscription_type',
+        ], $compiledSelector->getSelectedColumnsMap());
+    }
+
     public function testSelectColumnsWithPrefixRemoval(): void
     {
         $selector = new PrefixSelector('subscription_');
