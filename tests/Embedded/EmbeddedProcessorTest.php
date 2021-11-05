@@ -26,6 +26,25 @@ class EmbeddedProcessorTest extends TestCase
         ], $result->fetchAll());
     }
 
+    public function testProcessorWithCollection(): void
+    {
+        $processor = new EmbeddedProcessor(
+            'subscriptions',
+            new PrefixSelector('subscription_'),
+            isCollection: true
+        );
+
+        $result = (new ResultSet([
+            ['id' => 1, 'subscription_id' => 10, 'subscription_type' => 'PREMIUM'],
+            ['id' => 2, 'subscription_id' => 20, 'subscription_type' => 'LITE'],
+        ]))->withProcessor($processor);
+
+        $this->assertSame([
+            ['id' => 1, 'subscriptions' => [['id' => 10, 'type' => 'PREMIUM']]],
+            ['id' => 2, 'subscriptions' => [['id' => 20, 'type' => 'LITE']]],
+        ], $result->fetchAll());
+    }
+
     public function testProcessorWithPreservedColumns(): void
     {
         $processor = new EmbeddedProcessor(
@@ -50,11 +69,28 @@ class EmbeddedProcessorTest extends TestCase
         $processor = new EmbeddedProcessor('subscription', new PrefixSelector('subscription_'));
 
         $result = (new ResultSet([
-            ['id' => 1, 'subscription_id' => null, 'subscription_type' => null],
+            ['id' => 1, 'subscription_id' => null, 'subscription_type' => null, 'subscription_payments' => []],
         ]))->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscription' => null],
+        ], $result->fetchAll());
+    }
+
+    public function testProcessorWithEmptyCollectionItem(): void
+    {
+        $processor = new EmbeddedProcessor(
+            'subscriptions',
+            new PrefixSelector('subscription_'),
+            isCollection: true
+        );
+
+        $result = (new ResultSet([
+            ['id' => 1, 'subscription_id' => null, 'subscription_type' => null, 'subscription_payments' => []],
+        ]))->withProcessor($processor);
+
+        $this->assertSame([
+            ['id' => 1, 'subscriptions' => []],
         ], $result->fetchAll());
     }
 
@@ -63,11 +99,11 @@ class EmbeddedProcessorTest extends TestCase
         $processor = new EmbeddedProcessor('subscription', new PrefixSelector('subscription_'));
 
         $result = (new ResultSet([
-            ['id' => 1, 'subscription_id' => 10, 'subscription_type' => null],
+            ['id' => 1, 'subscription_id' => 10, 'subscription_type' => null, 'subscription_payments' => []],
         ]))->withProcessor($processor);
 
         $this->assertSame([
-            ['id' => 1, 'subscription' => ['id' => 10, 'type' => null]],
+            ['id' => 1, 'subscription' => ['id' => 10, 'type' => null, 'payments' => []]],
         ], $result->fetchAll());
     }
 }

@@ -6,20 +6,32 @@ namespace Smelesh\ResultSetMapper\Embedded;
 
 use Smelesh\ResultSetMapper\Selector\Selector;
 
+/**
+ * Collects columns into an embedded item (hashmap) or a collection of items.
+ *
+ * Nullable single items are converted to NULL.
+ * Nullable collection items are skipped.
+ */
 final class EmbeddedProcessor
 {
     private string $path;
+    private bool $isCollection;
     private Selector $columnsSelector;
     private array $preservedColumns;
 
     /**
-     * @param string $path Column path in "dot" notation where an embedded item should be created.
+     * @param string $path Embedded column name.
      * @param Selector $columnsSelector Selector to fetch columns for embedding.
      * @param list<string> $preservedColumns List of embedded columns that should be kept at original position.
      *                                       By default, all embedded columns are removed.
+     * @param bool $isCollection Embedded item should be created as a collection.
      */
-    public function __construct(string $path, Selector $columnsSelector, array $preservedColumns = [])
-    {
+    public function __construct(
+        string $path,
+        Selector $columnsSelector,
+        array $preservedColumns = [],
+        bool $isCollection = false,
+    ) {
         if (empty($path)) {
             throw new \InvalidArgumentException('Path should not be empty');
         }
@@ -27,6 +39,7 @@ final class EmbeddedProcessor
         $this->path = $path;
         $this->columnsSelector = $columnsSelector;
         $this->preservedColumns = $preservedColumns;
+        $this->isCollection = $isCollection;
     }
 
     public function __invoke(\Traversable $rows): \Traversable
@@ -44,7 +57,7 @@ final class EmbeddedProcessor
                 ));
             }
 
-            $embedded = $this->columnsSelector->apply($row);
+            $embedded = $columnsSelector->apply($row);
 
             foreach ($removedColumns as $column) {
                 unset($row[$column]);
@@ -54,7 +67,11 @@ final class EmbeddedProcessor
                 $embedded = null;
             }
 
-            $row[$this->path] = $embedded;
+            if ($this->isCollection) {
+                $row[$this->path] = $embedded !== null ? [$embedded] : [];
+            } else {
+                $row[$this->path] = $embedded;
+            }
 
             yield $row;
         }
@@ -63,7 +80,7 @@ final class EmbeddedProcessor
     private function isEmptyItem(array $item): bool
     {
         foreach ($item as $value) {
-            if ($value !== null) {
+            if ($value !== null && $value !== []) {
                 return false;
             }
         }
