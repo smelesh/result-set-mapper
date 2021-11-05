@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Smelesh\ResultSetMapper\Embedded;
 
+use Smelesh\ResultSetMapper\Internal\DotPath;
+
 /**
  * Merges duplicate rows and embedded collections.
  *
@@ -43,56 +45,16 @@ final class MergeProcessor
         if ($this->path === '') {
             yield from $this->mergeDuplicateRows($rows);
         } else {
-            $pathSegments = explode('.', $this->path);
-
             foreach ($rows as $row) {
-                $this->mapByPath(
+                DotPath::map(
                     $row,
-                    $pathSegments,
+                    $this->path,
                     /** @param list<array<string, mixed>> $items */
                     fn(array $items) => $this->mergeDuplicateRows($items)
                 );
 
                 yield $row;
             }
-        }
-    }
-
-    /**
-     * @param array $data
-     * @param list<string> $path
-     * @param callable(array):array $mapper
-     */
-    private function mapByPath(array &$data, array $path, callable $mapper): void
-    {
-        $field = array_shift($path);
-
-        // ignore inaccessible path
-        if ($field === null || !isset($data[$field]) || !is_array($data[$field])) {
-            return;
-        }
-
-        $value = &$data[$field];
-
-        if ($path === []) {
-            // end of path reached, map value
-            if (array_is_list($value)) {
-                $value = $mapper($value);
-            }
-
-            return;
-        }
-
-        if (array_is_list($value)) {
-            // scan embedded collection
-            foreach ($value as &$item) {
-                $this->mapByPath($item, $path, $mapper);
-            }
-
-            unset($item);
-        } else {
-            // scan embedded object
-            $this->mapByPath($value, $path, $mapper);
         }
     }
 

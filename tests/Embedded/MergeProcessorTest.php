@@ -139,7 +139,7 @@ class MergeProcessorTest extends TestCase
 
     public function testMergeAtSpecificPath(): void
     {
-        $processor = new MergeProcessor('subscriptions.features', ['id']);
+        $processor = new MergeProcessor('subscriptions[].features', ['id']);
 
         $result = (new ResultSet([
             ['id' => 1, 'name' => 'user #1', 'subscriptions' => [
