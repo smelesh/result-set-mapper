@@ -31,7 +31,7 @@ final class DotPath
      */
     public static function map(array &$data, string $path, callable $mapper): void
     {
-        foreach (self::refs($data, $path) as &$item) {
+        foreach (self::refs($data, self::parsePath($path)) as &$item) {
             $item = $mapper($item);
         }
 
@@ -39,94 +39,94 @@ final class DotPath
     }
 
     /**
-     * @param array<string, mixed> $data
+     * Collects references to each value at the specified path.
+     *
+     * @param list<string> $parsedPath
      */
-    private static function refs(array &$data, string $path, string $rootPath = ''): array
+    private static function refs(mixed &$data, array $parsedPath, int $level = 0): array
     {
-        if (str_contains($path, '.')) {
-            [$field, $nestedPath] = explode('.', $path, 2);
-        } else {
-            $field = $path;
-            $nestedPath = null;
+        if (!isset($parsedPath[$level])) {
+            return [&$data];
         }
 
-        $fieldPath = ($rootPath !== '' ? $rootPath . '.' : '') . $field;
-
-        if (str_ends_with($field, '[]')) {
-            $field = substr($field, 0, -2);
-            $expand = true;
-        } else {
-            $expand = false;
+        if (!is_array($data)) {
+            throw new \LogicException(sprintf(
+                'Unexpected value at path "%s", expected array, got "%s"',
+                self::buildPath($parsedPath, $level),
+                gettype($data)
+            ));
         }
 
-        if ($field === '') {
-            $value = &$data;
-        } elseif (isset($data[$field])) {
-            $value = &$data[$field];
-        } else {
-            return [];
-        }
+        $field = $parsedPath[$level];
 
-        if ($nestedPath !== null) {
-            if ($expand) {
-                if (!is_array($value)) {
-                    throw new \LogicException(sprintf(
-                        'Unexpected value at path "%s", expected array, got "%s"',
-                        substr($fieldPath, 0, -2),
-                        gettype($value)
-                    ));
-                }
+        if ($field === '[]') {
+            $refs = [];
 
-                $refs = [];
-
-                foreach ($value as &$item) {
-                    if (!is_array($item)) {
-                        throw new \LogicException(sprintf(
-                            'Unexpected value at path "%s", expected array, got "%s"',
-                            $fieldPath,
-                            gettype($item)
-                        ));
-                    }
-
-                    $refs = array_merge($refs, self::refs($item, $nestedPath, $fieldPath));
-                }
-
-                unset($item);
-            } else {
-                if (!is_array($value)) {
-                    throw new \LogicException(sprintf(
-                        'Unexpected value at path "%s", expected array, got "%s"',
-                        $fieldPath,
-                        gettype($value)
-                    ));
-                }
-
-                $refs = self::refs($value, $nestedPath, $fieldPath);
+            foreach ($data as &$item) {
+                $refs = array_merge($refs, self::refs($item, $parsedPath, $level + 1));
             }
+
+            unset($item);
 
             return $refs;
         }
 
-        if ($expand) {
-            if (!is_array($value)) {
-                throw new \LogicException(sprintf(
-                    'Unexpected value at path "%s", expected array, got "%s"',
-                    substr($fieldPath, 0, -2),
-                    gettype($value)
-                ));
-            }
-
-            $refs = [];
-
-            foreach ($value as &$item) {
-                $refs[] = &$item;
-            }
-
-            unset($item);
-        } else {
-            $refs = [&$value];
+        if (!isset($data[$field])) {
+            return [];
         }
 
-        return $refs;
+        return self::refs($data[$field], $parsedPath, $level + 1);
+    }
+
+    /**
+     * Parses path into a list of segments.
+     *
+     * @return list<string>
+     */
+    private static function parsePath(string $path): array
+    {
+        $segments = [];
+
+        foreach (explode('.', $path) as $segment) {
+            $expand = str_ends_with($segment, '[]');
+
+            if ($expand) {
+                $segment = substr($segment, 0, -2);
+            }
+
+            if ($segment !== '') {
+                $segments[] = $segment;
+            }
+
+            if ($expand) {
+                $segments[] = '[]';
+            }
+        }
+
+        return $segments;
+    }
+
+    /**
+     * Builds path from a list of segments.
+     *
+     * @param list<string> $segments
+     */
+    private static function buildPath(array $segments, int $level = -1): string
+    {
+        if ($level !== -1) {
+            $segments = array_slice($segments, 0, $level);
+        }
+
+        $path = '';
+
+        foreach ($segments as $segment) {
+            if ($path !== '' && $segment !== '[]') {
+                $path .= '.';
+            }
+
+            $path .= $segment;
+        }
+
+        return $path;
     }
 }
