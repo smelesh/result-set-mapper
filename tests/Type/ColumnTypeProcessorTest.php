@@ -16,8 +16,8 @@ class ColumnTypeProcessorTest extends TestCase
         $processor = new ColumnTypeProcessor(new SimpleTypeConverter(), [
             'id' => 'int',
             'subscription.is_active' => 'bool',
-            'payments.id' => 'int',
-            'payments.invoice.amount' => 'float',
+            'payments[].id' => 'int',
+            'payments[].invoice.amount' => 'float',
             'unknown' => 'int',
         ]);
 
