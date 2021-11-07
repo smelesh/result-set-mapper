@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Smelesh\ResultSetMapper\Type;
+namespace Smelesh\ResultSetMapper\Processor;
 
 use Smelesh\ResultSetMapper\Internal\DotPath;
+use Smelesh\ResultSetMapper\Type\TypeConverter;
 
 /**
  * Converts database column values into PHP representation.

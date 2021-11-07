@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Smelesh\ResultSetMapper\Tests\Embedded;
+namespace Smelesh\ResultSetMapper\Tests\Processor;
 
-use Smelesh\ResultSetMapper\Embedded\EmbeddedProcessor;
+use Smelesh\ResultSetMapper\Processor\EmbeddedProcessor;
 use PHPUnit\Framework\TestCase;
 use Smelesh\ResultSetMapper\ResultSet;
 use Smelesh\ResultSetMapper\Selector\PrefixSelector;

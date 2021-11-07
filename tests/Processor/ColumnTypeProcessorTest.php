@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Smelesh\ResultSetMapper\Tests\Type;
+namespace Smelesh\ResultSetMapper\Tests\Processor;
 
 use Smelesh\ResultSetMapper\ResultSet;
-use Smelesh\ResultSetMapper\Type\ColumnTypeProcessor;
+use Smelesh\ResultSetMapper\Processor\ColumnTypeProcessor;
 use PHPUnit\Framework\TestCase;
 use Smelesh\ResultSetMapper\Type\SimpleTypeConverter;
 

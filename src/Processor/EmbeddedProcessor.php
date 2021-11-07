@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Smelesh\ResultSetMapper\Embedded;
+namespace Smelesh\ResultSetMapper\Processor;
 
 use Smelesh\ResultSetMapper\Internal\DotPath;
 use Smelesh\ResultSetMapper\Selector\Selector;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Smelesh\ResultSetMapper\Tests\Embedded;
+namespace Smelesh\ResultSetMapper\Tests\Processor;
 
-use Smelesh\ResultSetMapper\Embedded\MergeProcessor;
+use Smelesh\ResultSetMapper\Processor\MergeProcessor;
 use PHPUnit\Framework\TestCase;
 use Smelesh\ResultSetMapper\ResultSet;
 
