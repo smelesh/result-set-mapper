@@ -39,6 +39,38 @@ final class DotPath
     }
 
     /**
+     * Sets value to each field at the specified path.
+     *
+     * When the field does not exist, it will be created, but only if the path to this field exists.
+     * When the path refers to a collection (ends with `[]`), a new collection will be created.
+     * NULL value will not be added to the collection.
+     *
+     * @internal
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function set(array &$data, string $path, mixed $value): void
+    {
+        $parsedPath = self::parsePath($path);
+        $field = array_pop($parsedPath);
+
+        if ($field === '[]') {
+            $value = $value !== null ? [$value] : [];
+            $field = array_pop($parsedPath);
+        }
+
+        foreach (self::refs($data, $parsedPath) as &$item) {
+            if ($field === null) {
+                $item = $value;
+            } else {
+                $item[$field] = $value;
+            }
+        }
+
+        unset($item);
+    }
+
+    /**
      * Collects references to each value at the specified path.
      *
      * @param list<string> $parsedPath

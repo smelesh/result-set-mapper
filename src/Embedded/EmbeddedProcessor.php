@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Smelesh\ResultSetMapper\Embedded;
 
+use Smelesh\ResultSetMapper\Internal\DotPath;
 use Smelesh\ResultSetMapper\Selector\Selector;
 
 /**
@@ -15,7 +16,6 @@ use Smelesh\ResultSetMapper\Selector\Selector;
 final class EmbeddedProcessor
 {
     private string $path;
-    private bool $isCollection;
     private Selector $columnsSelector;
     private array $preservedColumns;
 
@@ -24,22 +24,19 @@ final class EmbeddedProcessor
      * @param Selector $columnsSelector Selector to fetch columns for embedding.
      * @param list<string> $preservedColumns List of embedded columns that should be kept at original position.
      *                                       By default, all embedded columns are removed.
-     * @param bool $isCollection Embedded item should be created as a collection.
      */
     public function __construct(
         string $path,
         Selector $columnsSelector,
         array $preservedColumns = [],
-        bool $isCollection = false,
     ) {
-        if (empty($path)) {
+        if ($path === '') {
             throw new \InvalidArgumentException('Path should not be empty');
         }
 
         $this->path = $path;
         $this->columnsSelector = $columnsSelector;
         $this->preservedColumns = $preservedColumns;
-        $this->isCollection = $isCollection;
     }
 
     public function __invoke(\Traversable $rows): \Traversable
@@ -67,11 +64,7 @@ final class EmbeddedProcessor
                 $embedded = null;
             }
 
-            if ($this->isCollection) {
-                $row[$this->path] = $embedded !== null ? [$embedded] : [];
-            } else {
-                $row[$this->path] = $embedded;
-            }
+            DotPath::set($row, $this->path, $embedded);
 
             yield $row;
         }

@@ -206,4 +206,156 @@ class DotPathTest extends TestCase
 
         $this->assertSame([10001, 10002], $data);
     }
+
+    public function testSetSingleItem(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1'];
+
+        DotPath::set($data, 'subscription', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscription' => ['id' => 10, 'type' => 'PREMIUM'],
+        ], $data);
+    }
+
+    public function testSetEmptySingleItem(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1'];
+
+        DotPath::set($data, 'subscription', null);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscription' => null,
+        ], $data);
+    }
+
+    public function testSetCollectionItem(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1'];
+
+        DotPath::set($data, 'subscriptions[]', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame(['id' => 1, 'name' => 'user #1', 'subscriptions' => [
+            ['id' => 10, 'type' => 'PREMIUM'],
+        ]], $data);
+    }
+
+    public function testSetEmptyCollectionItem(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1'];
+
+        DotPath::set($data, 'subscriptions[]', null);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscriptions' => [],
+        ], $data);
+    }
+
+    public function testSetSingleItemAtExistingPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscription' => ['id' => 1]];
+
+        DotPath::set($data, 'subscription', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscription' => ['id' => 10, 'type' => 'PREMIUM'],
+        ], $data);
+    }
+
+    public function testSetCollectionItemAtExistingPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscriptions' => [
+            ['id' => 1],
+            ['id' => 2],
+        ]];
+
+        DotPath::set($data, 'subscriptions[]', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame(['id' => 1, 'name' => 'user #1', 'subscriptions' => [
+            ['id' => 10, 'type' => 'PREMIUM'],
+        ]], $data);
+    }
+
+    public function testSetSingleItemAtExistingEmptyPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscription' => null];
+
+        DotPath::set($data, 'subscription', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscription' => ['id' => 10, 'type' => 'PREMIUM'],
+        ], $data);
+    }
+
+    public function testSetCollectionItemAtExistingEmptyPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscriptions' => []];
+
+        DotPath::set($data, 'subscriptions[]', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame(['id' => 1, 'name' => 'user #1', 'subscriptions' => [
+            ['id' => 10, 'type' => 'PREMIUM'],
+        ]], $data);
+    }
+
+    public function testSetAtNestedPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscriptions' => [
+            ['id' => 10, 'type' => 'PREMIUM'],
+            ['id' => 20, 'type' => 'LITE'],
+        ]];
+
+        DotPath::set($data, 'subscriptions[].features[]', ['id' => 'SUBTITLES']);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscriptions' => [
+                ['id' => 10, 'type' => 'PREMIUM', 'features' => [['id' => 'SUBTITLES']]],
+                ['id' => 20, 'type' => 'LITE', 'features' => [['id' => 'SUBTITLES']]],
+            ],
+        ], $data);
+    }
+
+    public function testSetAtEmptyNestedPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscription' => null];
+
+        DotPath::set($data, 'subscription.features[]', ['id' => 'SUBTITLES']);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscription' => null,
+        ], $data);
+    }
+
+    public function testSetAtEmptyNestedCollectionPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1', 'subscriptions' => []];
+
+        DotPath::set($data, 'subscriptions[].features[]', ['id' => 'SUBTITLES']);
+
+        $this->assertSame([
+            'id' => 1, 'name' => 'user #1', 'subscriptions' => [],
+        ], $data);
+    }
+
+    public function testSetAtRootPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1'];
+
+        DotPath::set($data, '', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame([
+            'id' => 10, 'type' => 'PREMIUM',
+        ], $data);
+    }
+
+    public function testSetAtRootCollectionPath(): void
+    {
+        $data = ['id' => 1, 'name' => 'user #1'];
+
+        DotPath::set($data, '[]', ['id' => 10, 'type' => 'PREMIUM']);
+
+        $this->assertSame([
+            ['id' => 10, 'type' => 'PREMIUM'],
+        ], $data);
+    }
 }

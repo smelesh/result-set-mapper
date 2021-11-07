@@ -29,9 +29,8 @@ class EmbeddedProcessorTest extends TestCase
     public function testProcessorWithCollection(): void
     {
         $processor = new EmbeddedProcessor(
-            'subscriptions',
+            'subscriptions[]',
             new PrefixSelector('subscription_'),
-            isCollection: true
         );
 
         $result = (new ResultSet([
@@ -80,9 +79,8 @@ class EmbeddedProcessorTest extends TestCase
     public function testProcessorWithEmptyCollectionItem(): void
     {
         $processor = new EmbeddedProcessor(
-            'subscriptions',
+            'subscriptions[]',
             new PrefixSelector('subscription_'),
-            isCollection: true
         );
 
         $result = (new ResultSet([
