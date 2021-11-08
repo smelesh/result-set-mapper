@@ -104,4 +104,26 @@ class EmbeddedProcessorTest extends TestCase
             ['id' => 1, 'subscription' => ['id' => 10, 'type' => null, 'payments' => []]],
         ], $result->fetchAll());
     }
+
+    public function testProcessorWithNestedEmbeddable(): void
+    {
+        $processor = new EmbeddedProcessor(
+            'subscription.payments[]',
+            new PrefixSelector('payment_'),
+        );
+
+        $result = (new ResultSet([
+            ['id' => 1, 'subscription' => ['id' => 10], 'payment_id' => 100, 'payment_type' => 'PAYPAL'],
+            ['id' => 1, 'subscription' => ['id' => 10], 'payment_id' => 101, 'payment_type' => 'CREDIT_CARD'],
+        ]))->withProcessor($processor);
+
+        $this->assertSame([
+            ['id' => 1, 'subscription' => ['id' => 10, 'payments' => [
+                ['id' => 100, 'type' => 'PAYPAL'],
+            ]]],
+            ['id' => 1, 'subscription' => ['id' => 10, 'payments' => [
+                ['id' => 101, 'type' => 'CREDIT_CARD'],
+            ]]],
+        ], $result->fetchAll());
+    }
 }

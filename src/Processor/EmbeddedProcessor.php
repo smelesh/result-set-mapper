@@ -20,7 +20,7 @@ final class EmbeddedProcessor
     private array $preservedColumns;
 
     /**
-     * @param string $path Embedded column name.
+     * @param string $path Path in "dot" notation to embedded result.
      * @param Selector $columnsSelector Selector to fetch columns for embedding.
      * @param list<string> $preservedColumns List of embedded columns that should be kept at original position.
      *                                       By default, all embedded columns are removed.
