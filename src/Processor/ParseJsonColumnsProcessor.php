@@ -19,10 +19,6 @@ final class ParseJsonColumnsProcessor
     {
     }
 
-    /**
-     * @param \Traversable<array-key, array<string, mixed>> $rows
-     * @return \Traversable<array-key, array<string, mixed>>
-     */
     public function __invoke(\Traversable $rows): \Traversable
     {
         foreach ($rows as $row) {
