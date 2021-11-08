@@ -22,11 +22,11 @@ class MergeProcessorTest extends TestCase
     {
         $processor = new MergeProcessor('', ['id']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 101, 'type' => 'PREMIUM'],
             ['id' => 102, 'type' => 'PREMIUM'],
             ['id' => 101, 'type' => 'PREMIUM'], // duplicate
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 101, 'type' => 'PREMIUM'],
@@ -38,12 +38,12 @@ class MergeProcessorTest extends TestCase
     {
         $processor = new MergeProcessor('', ['id', 'app_id']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 101, 'app_id' => 'app1', 'type' => 'PREMIUM'],
             ['id' => 102, 'app_id' => 'app1', 'type' => 'PREMIUM'],
             ['id' => 101, 'app_id' => 'app1', 'type' => 'PREMIUM'], // duplicate
             ['id' => 101, 'app_id' => 'app2', 'type' => 'PREMIUM'],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 101, 'app_id' => 'app1', 'type' => 'PREMIUM'],
@@ -59,9 +59,9 @@ class MergeProcessorTest extends TestCase
 
         $processor = new MergeProcessor('', ['unknown']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 101, 'type' => 'PREMIUM'],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $result->fetchAll();
     }
@@ -73,9 +73,9 @@ class MergeProcessorTest extends TestCase
 
         $processor = new MergeProcessor('', ['options']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 101, 'options' => ['PREMIUM']],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $result->fetchAll();
     }
@@ -84,7 +84,7 @@ class MergeProcessorTest extends TestCase
     {
         $processor = new MergeProcessor('', ['id']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 101, 'type' => 'PREMIUM', 'features' => [
                 ['id' => 'SUBTITLES', 'name' => 'Show subtitles'],
                 ['id' => 'UPLOAD', 'name' => 'Allow uploads'],
@@ -96,7 +96,7 @@ class MergeProcessorTest extends TestCase
             ['id' => 102, 'type' => 'PREMIUM', 'features' => [
                 ['id' => 'SUBTITLES', 'name' => 'Show subtitles'],
             ]],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 101, 'type' => 'PREMIUM', 'features' => [
@@ -115,7 +115,7 @@ class MergeProcessorTest extends TestCase
     {
         $processor = new MergeProcessor('', ['id']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 101, 'type' => 'PREMIUM', 'product' => [
                 'id' => 1001, 'name' => 'Premium Monthly', 'options' => ['SUBTITLES', 'UPLOAD'],
             ]],
@@ -125,7 +125,7 @@ class MergeProcessorTest extends TestCase
             ['id' => 102, 'type' => 'PREMIUM', 'product' => [
                 'id' => 1001, 'name' => 'Premium Monthly', 'options' => ['SUBTITLES'],
             ]],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 101, 'type' => 'PREMIUM', 'product' => [
@@ -141,7 +141,7 @@ class MergeProcessorTest extends TestCase
     {
         $processor = new MergeProcessor('subscriptions[].features', ['id']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1', 'subscriptions' => [
                 ['id' => 101, 'type' => 'PREMIUM', 'features' => [
                     ['id' => 'SUBTITLES', 'name' => 'Show subtitles'],
@@ -163,7 +163,7 @@ class MergeProcessorTest extends TestCase
                     ['id' => 'ADD_COMMENT', 'name' => 'Add comments'], // duplicate
                 ]],
             ]],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'name' => 'user #1', 'subscriptions' => [
@@ -191,10 +191,10 @@ class MergeProcessorTest extends TestCase
     {
         $processor = new MergeProcessor('subscription.features', ['id']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1', 'subscription' => null],
             ['id' => 2, 'name' => 'user #2', 'subscription' => ['id' => 101, 'type' => 'PREMIUM', 'features' => []]],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'name' => 'user #1', 'subscription' => null],

@@ -12,9 +12,37 @@ use Smelesh\ResultSetMapper\Tests\Stubs\VerboseTypeConverter;
 
 class ResultSetTest extends TestCase
 {
+    public function testCreateFromArray(): void
+    {
+        $result = ResultSet::fromRows([
+            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 2, 'name' => 'user #2'],
+        ]);
+
+        $this->assertSame([
+            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 2, 'name' => 'user #2'],
+        ], $result->fetchAll());
+    }
+
+    public function testCreateFromGenerator(): void
+    {
+        $generator = static function (): iterable {
+            yield ['id' => 1, 'name' => 'user #1'];
+            yield ['id' => 2, 'name' => 'user #2'];
+        };
+
+        $result = ResultSet::fromRows($generator());
+
+        $this->assertSame([
+            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 2, 'name' => 'user #2'],
+        ], $result->fetchAll());
+    }
+
     public function testFetch(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1'],
             ['id' => 2, 'name' => 'user #2'],
         ]);
@@ -26,7 +54,7 @@ class ResultSetTest extends TestCase
 
     public function testFetchWithEmptyResultSet(): void
     {
-        $result = new ResultSet();
+        $result = ResultSet::fromRows([]);
 
         $this->assertNull($result->fetch());
     }
@@ -38,7 +66,7 @@ class ResultSetTest extends TestCase
             yield ['id' => 2, 'name' => 'user #2'];
         };
 
-        $result = new ResultSet($generator());
+        $result = ResultSet::fromRows($generator());
 
         $this->assertSame(['id' => 1, 'name' => 'user #1'], $result->fetch());
         $this->assertSame(['id' => 2, 'name' => 'user #2'], $result->fetch());
@@ -47,7 +75,7 @@ class ResultSetTest extends TestCase
 
     public function testFetchAll(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1'],
             ['id' => 2, 'name' => 'user #2'],
         ]);
@@ -60,14 +88,14 @@ class ResultSetTest extends TestCase
 
     public function testFetchAllWithEmptyResultSet(): void
     {
-        $result = new ResultSet();
+        $result = ResultSet::fromRows([]);
 
         $this->assertEmpty($result->fetchAll());
     }
 
     public function testIterate(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1'],
             ['id' => 2, 'name' => 'user #2'],
         ]);
@@ -80,7 +108,7 @@ class ResultSetTest extends TestCase
 
     public function testWithProcessor(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1'],
             ['id' => 2, 'name' => 'user #2'],
         ]);
@@ -98,7 +126,7 @@ class ResultSetTest extends TestCase
 
     public function testParseJsonColumns(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1', 'subscription' => '{"id": 100, "type": "PREMIUM"}'],
         ]);
 
@@ -113,7 +141,7 @@ class ResultSetTest extends TestCase
 
     public function testMerge(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1', 'subscriptions' => [['id' => 100, 'type' => 'PREMIUM']]],
             ['id' => 1, 'name' => 'user #1', 'subscriptions' => [['id' => 101, 'type' => 'LITE']]],
             ['id' => 2, 'name' => 'user #2', 'subscriptions' => [['id' => 100, 'type' => 'PREMIUM']]],
@@ -138,7 +166,7 @@ class ResultSetTest extends TestCase
      */
     public function testEmbed(string|array|Selector $selector): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'name' => 'user #1', 's_id' => 100, 's_type' => 'PREMIUM'],
         ]);
 
@@ -161,7 +189,7 @@ class ResultSetTest extends TestCase
 
     public function testTypes(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => '1'],
         ]);
 
@@ -176,7 +204,7 @@ class ResultSetTest extends TestCase
 
     public function testTypesWithCustomInlineConverter(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => '1'],
         ]);
 
@@ -191,7 +219,7 @@ class ResultSetTest extends TestCase
 
     public function testTypesWithCustomDefaultConverter(): void
     {
-        $result = new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => '1'],
         ]);
 

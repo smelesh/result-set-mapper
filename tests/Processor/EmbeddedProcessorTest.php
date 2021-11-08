@@ -15,10 +15,10 @@ class EmbeddedProcessorTest extends TestCase
     {
         $processor = new EmbeddedProcessor('subscription', new PrefixSelector('subscription_'));
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription_id' => 10, 'subscription_type' => 'PREMIUM'],
             ['id' => 2, 'subscription_id' => 20, 'subscription_type' => 'LITE'],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscription' => ['id' => 10, 'type' => 'PREMIUM']],
@@ -33,10 +33,10 @@ class EmbeddedProcessorTest extends TestCase
             new PrefixSelector('subscription_'),
         );
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription_id' => 10, 'subscription_type' => 'PREMIUM'],
             ['id' => 2, 'subscription_id' => 20, 'subscription_type' => 'LITE'],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscriptions' => [['id' => 10, 'type' => 'PREMIUM']]],
@@ -52,10 +52,10 @@ class EmbeddedProcessorTest extends TestCase
             ['subscription_id']
         );
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription_id' => 10, 'subscription_type' => 'PREMIUM'],
             ['id' => 2, 'subscription_id' => 20, 'subscription_type' => 'LITE'],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscription_id' => 10, 'subscription' => ['id' => 10, 'type' => 'PREMIUM']],
@@ -67,9 +67,9 @@ class EmbeddedProcessorTest extends TestCase
     {
         $processor = new EmbeddedProcessor('subscription', new PrefixSelector('subscription_'));
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription_id' => null, 'subscription_type' => null, 'subscription_payments' => []],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscription' => null],
@@ -83,9 +83,9 @@ class EmbeddedProcessorTest extends TestCase
             new PrefixSelector('subscription_'),
         );
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription_id' => null, 'subscription_type' => null, 'subscription_payments' => []],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscriptions' => []],
@@ -96,9 +96,9 @@ class EmbeddedProcessorTest extends TestCase
     {
         $processor = new EmbeddedProcessor('subscription', new PrefixSelector('subscription_'));
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription_id' => 10, 'subscription_type' => null, 'subscription_payments' => []],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscription' => ['id' => 10, 'type' => null, 'payments' => []]],
@@ -112,10 +112,10 @@ class EmbeddedProcessorTest extends TestCase
             new PrefixSelector('payment_'),
         );
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             ['id' => 1, 'subscription' => ['id' => 10], 'payment_id' => 100, 'payment_type' => 'PAYPAL'],
             ['id' => 1, 'subscription' => ['id' => 10], 'payment_id' => 101, 'payment_type' => 'CREDIT_CARD'],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             ['id' => 1, 'subscription' => ['id' => 10, 'payments' => [

@@ -32,10 +32,21 @@ final class ResultSet
     /**
      * @param iterable<TKey, TValue> $rows
      */
-    public function __construct(iterable $rows = [])
+    private function __construct(iterable $rows)
     {
         $this->rows = new \IteratorIterator(is_array($rows) ? new \ArrayIterator($rows) : $rows);
         $this->rows->rewind();
+    }
+
+    /**
+     * @template TSourceKey
+     * @template TSourceValue
+     * @param iterable<TSourceKey, TSourceValue> $rows
+     * @return self<TSourceKey, TSourceValue>
+     */
+    public static function fromRows(iterable $rows): self
+    {
+        return new self($rows);
     }
 
     /**

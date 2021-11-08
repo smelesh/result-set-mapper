@@ -14,13 +14,13 @@ class ParseJsonColumnsProcessorTest extends TestCase
     {
         $processor = new ParseJsonColumnsProcessor(['subscription', 'payments']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             [
                 'id' => '1',
                 'subscription' => '{"id": 10, "type": "PREMIUM"}',
                 'payments' => '[{"id": 1000, "amount": 1.99}, {"id": 1001, "amount": 0.99}]',
             ],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             [
@@ -38,13 +38,13 @@ class ParseJsonColumnsProcessorTest extends TestCase
     {
         $processor = new ParseJsonColumnsProcessor(['subscription', 'payments']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             [
                 'id' => '1',
                 'subscription' => null,
                 'payments' => '[]',
             ],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             [
@@ -59,11 +59,11 @@ class ParseJsonColumnsProcessorTest extends TestCase
     {
         $processor = new ParseJsonColumnsProcessor(['unknown']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             [
                 'id' => '1',
             ],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $this->assertSame([
             [
@@ -79,12 +79,12 @@ class ParseJsonColumnsProcessorTest extends TestCase
 
         $processor = new ParseJsonColumnsProcessor(['invalid']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             [
                 'id' => '1',
                 'invalid' => 'invalid_json',
             ],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $result->fetchAll();
     }
@@ -96,12 +96,12 @@ class ParseJsonColumnsProcessorTest extends TestCase
 
         $processor = new ParseJsonColumnsProcessor(['invalid']);
 
-        $result = (new ResultSet([
+        $result = ResultSet::fromRows([
             [
                 'id' => '1',
                 'invalid' => true,
             ],
-        ]))->withProcessor($processor);
+        ])->withProcessor($processor);
 
         $result->fetchAll();
     }
