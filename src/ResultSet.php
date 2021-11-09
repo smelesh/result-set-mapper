@@ -8,7 +8,6 @@ use Smelesh\ResultSetMapper\Internal\Iterator;
 use Smelesh\ResultSetMapper\Processor\ColumnTypeProcessor;
 use Smelesh\ResultSetMapper\Processor\EmbeddedProcessor;
 use Smelesh\ResultSetMapper\Processor\MergeProcessor;
-use Smelesh\ResultSetMapper\Processor\ParseJsonColumnsProcessor;
 use Smelesh\ResultSetMapper\Selector\NamesSelector;
 use Smelesh\ResultSetMapper\Selector\PrefixSelector;
 use Smelesh\ResultSetMapper\Selector\Selector;
@@ -65,14 +64,14 @@ final class ResultSet
     /**
      * Parses JSON serialized columns so their inner structures can be traversed by other processors.
      *
-     * @see ParseJsonColumnsProcessor
+     * @see types
      *
      * @param list<string> $columns List of JSON columns to parse.
      * @return self<TKey, TValue>
      */
     public function parseJsonColumns(array $columns): self
     {
-        return $this->withProcessor(new ParseJsonColumnsProcessor($columns));
+        return $this->types(array_fill_keys($columns, 'json'), new SimpleTypeConverter());
     }
 
     /**

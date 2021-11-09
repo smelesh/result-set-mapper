@@ -187,15 +187,24 @@ class ResultSetTest extends TestCase
     public function testParseJsonColumns(): void
     {
         $result = ResultSet::fromRows([
-            ['id' => 1, 'name' => 'user #1', 'subscription' => '{"id": 100, "type": "PREMIUM"}'],
+            [
+                'id' => 1,
+                'name' => 'user #1',
+                'subscription' => '{"id": 100, "type": "PREMIUM"}',
+                'payments' => '[{"id": 1000, "amount": 1.99}, {"id": 1001, "amount": 0.99}]',
+            ],
         ]);
 
-        $result = $result->parseJsonColumns(['subscription']);
+        $result = $result->parseJsonColumns(['subscription', 'payments']);
 
         $this->assertSame([
             'id' => 1,
             'name' => 'user #1',
             'subscription' => ['id' => 100, 'type' => 'PREMIUM'],
+            'payments' => [
+                ['id' => 1000, 'amount' => 1.99],
+                ['id' => 1001, 'amount' => 0.99],
+            ],
         ], $result->fetch());
     }
 
