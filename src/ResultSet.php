@@ -140,7 +140,7 @@ final class ResultSet
      *
      * @see ColumnTypeProcessor
      *
-     * @param array<string, string> $types Map of column path in dot notation to its type.
+     * @param array<string, string|callable(mixed):mixed> $types Map of column path in dot notation to its type.
      * @param TypeConverter|null $typeConverter Custom type converter, or `null` to use the default one.
      * @return self<TKey, TValue>
      */

@@ -35,4 +35,27 @@ class ColumnTypeProcessorTest extends TestCase
             ['id' => 2, 'name' => 'user #2', 'subscription' => null, 'payments' => []],
         ], $result->fetchAll());
     }
+
+    public function testProcessorWithCallableType(): void
+    {
+        $processor = new ColumnTypeProcessor(new SimpleTypeConverter(), [
+            'payments[].is_active' => fn(string $value) => (bool) $value,
+        ]);
+
+        $result = ResultSet::fromRows([
+            ['id' => '1', 'payments' => [
+                ['id' => '1000', 'is_active' => '1'],
+                ['id' => '1000', 'is_active' => '0'],
+            ]],
+            ['id' => '2', 'payments' => []],
+        ])->withProcessor($processor);
+
+        $this->assertSame([
+            ['id' => '1', 'payments' => [
+                ['id' => '1000', 'is_active' => true],
+                ['id' => '1000', 'is_active' => false],
+            ]],
+            ['id' => '2', 'payments' => []],
+        ], $result->fetchAll());
+    }
 }
