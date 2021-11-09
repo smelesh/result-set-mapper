@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Smelesh\ResultSetMapper;
 
+use Smelesh\ResultSetMapper\Internal\Iterator;
 use Smelesh\ResultSetMapper\Processor\ColumnTypeProcessor;
 use Smelesh\ResultSetMapper\Processor\EmbeddedProcessor;
 use Smelesh\ResultSetMapper\Processor\MergeProcessor;
@@ -23,9 +24,9 @@ use Smelesh\ResultSetMapper\Type\TypeConverter;
 final class ResultSet
 {
     /**
-     * @var \Iterator<TKey, TValue>
+     * @var Iterator<TKey, TValue>
      */
-    private \Iterator $rows;
+    private Iterator $rows;
 
     private ?TypeConverter $defaultTypeConverter = null;
 
@@ -34,8 +35,7 @@ final class ResultSet
      */
     private function __construct(iterable $rows)
     {
-        $this->rows = new \IteratorIterator(is_array($rows) ? new \ArrayIterator($rows) : $rows);
-        $this->rows->rewind();
+        $this->rows = Iterator::fromIterable($rows);
     }
 
     /**
@@ -160,14 +160,11 @@ final class ResultSet
      */
     public function fetch(): mixed
     {
-        if (!$this->rows->valid()) {
+        if (!$this->rows->advance()) {
             return null;
         }
 
-        $row = $this->rows->current();
-        $this->rows->next();
-
-        return $row;
+        return $this->rows->current();
     }
 
     /**

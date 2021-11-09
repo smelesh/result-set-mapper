@@ -106,6 +106,66 @@ class ResultSetTest extends TestCase
         ], iterator_to_array($result->iterate()));
     }
 
+    public function testDeferReadUntilFetch(): void
+    {
+        $totalReads = 0;
+
+        $generator = static function () use (&$totalReads): \Traversable {
+            for ($i = 1; $i <= 2; $i++) {
+                $totalReads++;
+                yield ['id' => $i];
+            }
+        };
+
+        $result = ResultSet::fromRows($generator());
+        $this->assertSame(0, $totalReads);
+
+        $this->assertNotNull($result->fetch());
+        $this->assertSame(1, $totalReads);
+
+        $this->assertNotNull($result->fetch());
+        $this->assertSame(2, $totalReads);
+
+        $this->assertNull($result->fetch());
+        $this->assertSame(2, $totalReads);
+    }
+
+    public function testFetchAllShouldFailWhenAlreadyRead(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot rewind a generator that was already run');
+
+        $result = ResultSet::fromRows([
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+        ]);
+
+        $this->assertNotNull($result->fetch());
+        $this->assertNotNull($result->fetch());
+
+        $this->assertNull($result->fetchAll());
+    }
+
+    public function testIterateShouldFailWhenAlreadyRead(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot rewind a generator that was already run');
+
+        $result = ResultSet::fromRows([
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+        ]);
+
+        $this->assertNotNull($result->fetch());
+        $this->assertNotNull($result->fetch());
+
+        foreach ($result->iterate() as $row) {
+            $this->fail('Iterating is not allowed');
+        }
+    }
+
     public function testWithProcessor(): void
     {
         $result = ResultSet::fromRows([
