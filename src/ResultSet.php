@@ -20,13 +20,12 @@ use Smelesh\ResultSetMapper\Type\TypeConverter;
 /**
  * Result set provides the functionality to iterate and process rows.
  *
- * @template TKey
  * @template TValue
  */
 final class ResultSet
 {
     /**
-     * @var Iterator<TKey, TValue>
+     * @var Iterator<array-key, TValue>
      */
     private Iterator $rows;
 
@@ -35,7 +34,7 @@ final class ResultSet
     private ?Hydrator $defaultHydrator = null;
 
     /**
-     * @param iterable<TKey, TValue> $rows
+     * @param iterable<TValue> $rows
      */
     private function __construct(iterable $rows)
     {
@@ -43,10 +42,9 @@ final class ResultSet
     }
 
     /**
-     * @template TSourceKey
      * @template TSourceValue
-     * @param iterable<TSourceKey, TSourceValue> $rows
-     * @return self<TSourceKey, TSourceValue>
+     * @param iterable<TSourceValue> $rows
+     * @return self<TSourceValue>
      */
     public static function fromRows(iterable $rows): self
     {
@@ -56,10 +54,9 @@ final class ResultSet
     /**
      * Decorates result set with rows processor.
      *
-     * @template TNewKey
      * @template TNewValue
-     * @param callable(\Traversable<TKey, TValue>):\Traversable<TNewKey, TNewValue> $processor
-     * @return self<TNewKey, TNewValue>
+     * @param callable(\Traversable<TValue>):\Traversable<TNewValue> $processor
+     * @return self<TNewValue>
      */
     public function withProcessor(callable $processor): self
     {
@@ -72,7 +69,7 @@ final class ResultSet
      * @see types
      *
      * @param list<string> $columns List of JSON columns to parse.
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function parseJsonColumns(array $columns): self
     {
@@ -86,7 +83,7 @@ final class ResultSet
      * @see MergeProcessor
      *
      * @param list<string> $distinctBy List of fields to check in a row to distinct from other rows.
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function mergeRoot(array $distinctBy): self
     {
@@ -100,7 +97,7 @@ final class ResultSet
      *
      * @param string $path Path in "dot" notation to a collection of items that should be merged.
      * @param list<string> $distinctBy List of fields to check in an item to distinct from other items.
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function merge(string $path, array $distinctBy): self
     {
@@ -115,7 +112,7 @@ final class ResultSet
      * @param string $path Path in "dot" notation to embedded result.
      * @param string|array<string>|Selector $columns Embeddable columns as a prefix, or columns map, or custom selector.
      * @param list<string> $preservedColumns List of embedded columns that should be kept at original position.
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function embed(string $path, string|array|Selector $columns, array $preservedColumns = []): self
     {
@@ -130,7 +127,7 @@ final class ResultSet
      * Changes default type converter.
      * If not set, {@link SimpleTypeConverter} will be used by default.
      *
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function withDefaultTypeConverter(TypeConverter $typeConverter): self
     {
@@ -147,7 +144,7 @@ final class ResultSet
      *
      * @param array<string, string|callable(mixed):mixed> $types Map of column path in dot notation to its type.
      * @param TypeConverter|null $typeConverter Custom type converter, or `null` to use the default one.
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function types(array $types, ?TypeConverter $typeConverter = null): self
     {
@@ -161,7 +158,7 @@ final class ResultSet
      * Changes default hydrator.
      * If not set, {@link SimpleHydrator} will be used by default.
      *
-     * @return self<TKey, TValue>
+     * @return self<TValue>
      */
     public function withDefaultHydrator(Hydrator $hydrator): self
     {
@@ -178,7 +175,7 @@ final class ResultSet
      *
      * @template TNewValue
      * @param class-string<TNewValue> $targetClass
-     * @return self<TKey, TNewValue>
+     * @return self<TNewValue>
      */
     public function hydrate(string $targetClass, ?Hydrator $hydrator = null): self
     {
@@ -205,7 +202,7 @@ final class ResultSet
     /**
      * Returns all rows from the result set.
      *
-     * @return array<TKey, TValue>
+     * @return array<TValue>
      */
     public function fetchAll(): array
     {
@@ -215,7 +212,7 @@ final class ResultSet
     /**
      * Returns iterator over result set rows.
      *
-     * @return \Traversable<TKey, TValue>
+     * @return \Traversable<TValue>
      */
     public function iterate(): \Traversable
     {
