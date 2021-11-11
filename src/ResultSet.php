@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Smelesh\ResultSetMapper;
 
+use Smelesh\ResultSetMapper\Hydrator\Hydrator;
+use Smelesh\ResultSetMapper\Hydrator\SimpleHydrator;
 use Smelesh\ResultSetMapper\Internal\Iterator;
 use Smelesh\ResultSetMapper\Processor\ColumnTypeProcessor;
 use Smelesh\ResultSetMapper\Processor\EmbeddedProcessor;
+use Smelesh\ResultSetMapper\Processor\HydrateProcessor;
 use Smelesh\ResultSetMapper\Processor\MergeProcessor;
 use Smelesh\ResultSetMapper\Selector\NamesSelector;
 use Smelesh\ResultSetMapper\Selector\PrefixSelector;
@@ -28,6 +31,8 @@ final class ResultSet
     private Iterator $rows;
 
     private ?TypeConverter $defaultTypeConverter = null;
+
+    private ?Hydrator $defaultHydrator = null;
 
     /**
      * @param iterable<TKey, TValue> $rows
@@ -149,6 +154,37 @@ final class ResultSet
         return $this->withProcessor(new ColumnTypeProcessor(
             $typeConverter ?? $this->defaultTypeConverter ?? new SimpleTypeConverter(),
             $types,
+        ));
+    }
+
+    /**
+     * Changes default hydrator.
+     * If not set, {@link SimpleHydrator} will be used by default.
+     *
+     * @return self<TKey, TValue>
+     */
+    public function withDefaultHydrator(Hydrator $hydrator): self
+    {
+        $result = new self($this->rows);
+        $result->defaultHydrator = $hydrator;
+
+        return $result;
+    }
+
+    /**
+     * Converts each row into object of the given class.
+     *
+     * @see HydrateProcessor
+     *
+     * @template TNewValue
+     * @param class-string<TNewValue> $targetClass
+     * @return self<TKey, TNewValue>
+     */
+    public function hydrate(string $targetClass, ?Hydrator $hydrator = null): self
+    {
+        return $this->withProcessor(new HydrateProcessor(
+            $hydrator ?? $this->defaultHydrator ?? new SimpleHydrator(),
+            $targetClass,
         ));
     }
 

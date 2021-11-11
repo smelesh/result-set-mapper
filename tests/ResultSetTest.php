@@ -8,6 +8,8 @@ use Smelesh\ResultSetMapper\ResultSet;
 use PHPUnit\Framework\TestCase;
 use Smelesh\ResultSetMapper\Selector\PrefixSelector;
 use Smelesh\ResultSetMapper\Selector\Selector;
+use Smelesh\ResultSetMapper\Tests\Fixtures\UserDto;
+use Smelesh\ResultSetMapper\Tests\Stubs\NamedArgumentsHydrator;
 use Smelesh\ResultSetMapper\Tests\Stubs\VerboseTypeConverter;
 
 class ResultSetTest extends TestCase
@@ -300,5 +302,40 @@ class ResultSetTest extends TestCase
         $this->assertSame([
             'id' => 'convert(\'1\', int)',
         ], $result->fetch());
+    }
+
+    public function testHydrate(): void
+    {
+        $result = ResultSet::fromRows([
+            ['id' => 1, 'name' => 'user #1'],
+        ]);
+
+        $result = $result->hydrate(UserDto::class);
+
+        $this->assertEquals(new UserDto(1, 'user #1'), $result->fetch());
+    }
+
+    public function testHydrateWithCustomInlineHydrator(): void
+    {
+        $result = ResultSet::fromRows([
+            ['id' => 1, 'name' => 'user #1'],
+        ]);
+
+        $result = $result->hydrate(UserDto::class, new NamedArgumentsHydrator());
+
+        $this->assertEquals(new UserDto(1, 'user #1'), $result->fetch());
+    }
+
+    public function testHydrateWithCustomDefaultHydrator(): void
+    {
+        $result = ResultSet::fromRows([
+            ['id' => 1, 'name' => 'user #1'],
+        ]);
+
+        $result = $result
+            ->withDefaultHydrator(new NamedArgumentsHydrator())
+            ->hydrate(UserDto::class);
+
+        $this->assertEquals(new UserDto(1, 'user #1'), $result->fetch());
     }
 }
