@@ -18,6 +18,7 @@
         "symfony/polyfill-php81": "^1.23"
     },
     "require-dev": {
+        "doctrine/dbal": "^2.12|^3.0",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.11"
     },
