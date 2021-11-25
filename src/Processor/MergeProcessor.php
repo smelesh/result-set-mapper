@@ -128,7 +128,7 @@ final class MergeProcessor
             if (!is_scalar($value)) {
                 throw new \LogicException(sprintf(
                     'Only scalar values are allowed as distinct key, got "%s" at column "%s"',
-                    gettype($value),
+                    get_debug_type($value),
                     $column
                 ));
             }

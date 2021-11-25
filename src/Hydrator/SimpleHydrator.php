@@ -17,7 +17,10 @@ final class SimpleHydrator implements Hydrator
     public function hydrate(mixed $data, string $targetClass): object
     {
         if (!is_array($data)) {
-            throw new \LogicException(sprintf('Unable to hydrate from "%s", expected array', gettype($data)));
+            throw new \LogicException(sprintf(
+                'Unable to hydrate from "%s", expected array',
+                get_debug_type($data)
+            ));
         }
 
         if (!class_exists($targetClass)) {

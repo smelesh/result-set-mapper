@@ -55,7 +55,7 @@ class MergeProcessorTest extends TestCase
     public function testMergeWithMissingDistinctKey(): void
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Only scalar values are allowed as distinct key, got "NULL" at column "unknown"');
+        $this->expectExceptionMessage('Only scalar values are allowed as distinct key, got "null" at column "unknown"');
 
         $processor = new MergeProcessor('', ['unknown']);
 

@@ -85,7 +85,7 @@ final class DotPath
             throw new \LogicException(sprintf(
                 'Unexpected value at path "%s", expected array, got "%s"',
                 self::buildPath($parsedPath, $level),
-                gettype($data)
+                get_debug_type($data)
             ));
         }
 

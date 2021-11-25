@@ -27,7 +27,7 @@ final class SimpleTypeConverter implements TypeConverter
         } catch (\Throwable $e) {
             throw new \UnexpectedValueException(sprintf(
                 'Unable to convert value of type "%s" to type "%s"',
-                gettype($value),
+                get_debug_type($value),
                 $type,
             ), 0, $e);
         }
