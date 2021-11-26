@@ -11,6 +11,7 @@ use Smelesh\ResultSetMapper\Selector\Selector;
 use Smelesh\ResultSetMapper\Tests\Fixtures\UserDto;
 use Smelesh\ResultSetMapper\Tests\Stubs\NamedArgumentsHydrator;
 use Smelesh\ResultSetMapper\Tests\Stubs\VerboseTypeConverter;
+use Smelesh\ResultSetMapper\Type\SimpleTypeConverter;
 
 class ResultSetTest extends TestCase
 {
@@ -186,6 +187,23 @@ class ResultSetTest extends TestCase
         $this->assertNull($result->fetch());
     }
 
+    public function testPreserveExistingContextWhenDecorateResultSet(): void
+    {
+        $result = ResultSet::fromRows([
+            ['id' => 1, 'name' => 'user #1', 'createdAt' => new \DateTimeImmutable('2021-11-26 01:02:03')],
+        ])
+            ->withDefaultTypeConverter(new VerboseTypeConverter())
+            ->withDefaultHydrator(new NamedArgumentsHydrator())
+            ->types(['name' => 'string'])
+            ->hydrate(UserDto::class);
+
+        $this->assertEquals(new UserDto(
+            1,
+            'convert(\'user #1\', string)',
+            new \DateTimeImmutable('2021-11-26 01:02:03'),
+        ), $result->fetch());
+    }
+
     public function testParseJsonColumns(): void
     {
         $result = ResultSet::fromRows([
@@ -307,35 +325,47 @@ class ResultSetTest extends TestCase
     public function testHydrate(): void
     {
         $result = ResultSet::fromRows([
-            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 1, 'name' => 'user #1', 'created_at' => '2021-11-26 01:02:03'],
         ]);
 
         $result = $result->hydrate(UserDto::class);
 
-        $this->assertEquals(new UserDto(1, 'user #1'), $result->fetch());
+        $this->assertEquals(new UserDto(
+            1,
+            'user #1',
+            new \DateTimeImmutable('2021-11-26 01:02:03'),
+        ), $result->fetch());
     }
 
     public function testHydrateWithCustomInlineHydrator(): void
     {
         $result = ResultSet::fromRows([
-            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 1, 'name' => 'user #1', 'createdAt' => new \DateTimeImmutable('2021-11-26 01:02:03')],
         ]);
 
         $result = $result->hydrate(UserDto::class, new NamedArgumentsHydrator());
 
-        $this->assertEquals(new UserDto(1, 'user #1'), $result->fetch());
+        $this->assertEquals(new UserDto(
+            1,
+            'user #1',
+            new \DateTimeImmutable('2021-11-26 01:02:03'),
+        ), $result->fetch());
     }
 
     public function testHydrateWithCustomDefaultHydrator(): void
     {
         $result = ResultSet::fromRows([
-            ['id' => 1, 'name' => 'user #1'],
+            ['id' => 1, 'name' => 'user #1', 'createdAt' => new \DateTimeImmutable('2021-11-26 01:02:03')],
         ]);
 
         $result = $result
             ->withDefaultHydrator(new NamedArgumentsHydrator())
             ->hydrate(UserDto::class);
 
-        $this->assertEquals(new UserDto(1, 'user #1'), $result->fetch());
+        $this->assertEquals(new UserDto(
+            1,
+            'user #1',
+            new \DateTimeImmutable('2021-11-26 01:02:03'),
+        ), $result->fetch());
     }
 }

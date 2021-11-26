@@ -10,6 +10,6 @@ final class HydrateToWrongTargetDto implements Hydratable
 {
     public static function hydrate(array $data): UserDto
     {
-        return new UserDto(1, 'incorrect');
+        return new UserDto(1, 'incorrect', new \DateTimeImmutable());
     }
 }

@@ -36,9 +36,16 @@ final class ResultSet
     /**
      * @param iterable<TValue> $rows
      */
-    private function __construct(iterable $rows)
-    {
+    private function __construct(
+        iterable $rows,
+        ?ResultSet $resultSet = null
+    ) {
         $this->rows = Iterator::fromIterable($rows);
+
+        if ($resultSet !== null) {
+            $this->defaultTypeConverter = $resultSet->defaultTypeConverter;
+            $this->defaultHydrator = $resultSet->defaultHydrator;
+        }
     }
 
     /**
@@ -60,7 +67,7 @@ final class ResultSet
      */
     public function withProcessor(callable $processor): self
     {
-        return new self($processor($this->rows));
+        return new self($processor($this->rows), $this);
     }
 
     /**
@@ -131,7 +138,7 @@ final class ResultSet
      */
     public function withDefaultTypeConverter(TypeConverter $typeConverter): self
     {
-        $result = new self($this->rows);
+        $result = clone $this;
         $result->defaultTypeConverter = $typeConverter;
 
         return $result;
@@ -162,7 +169,7 @@ final class ResultSet
      */
     public function withDefaultHydrator(Hydrator $hydrator): self
     {
-        $result = new self($this->rows);
+        $result = clone $this;
         $result->defaultHydrator = $hydrator;
 
         return $result;

@@ -19,9 +19,14 @@ class SimpleHydratorTest extends TestCase
         $result = $hydrator->hydrate([
             'id' => 1,
             'name' => 'user #1',
+            'created_at' => '2021-11-26 01:02:03',
         ], UserDto::class);
 
-        $this->assertEquals(new UserDto(1, 'user #1'), $result);
+        $this->assertEquals(new UserDto(
+            1,
+            'user #1',
+            new \DateTimeImmutable('2021-11-26 01:02:03'),
+        ), $result);
     }
 
     public function testHydrateFailedByHydratable(): void
@@ -34,6 +39,7 @@ class SimpleHydratorTest extends TestCase
         $hydrator->hydrate([
             'id' => null,
             'name' => 'user #1',
+            'created_at' => new \DateTimeImmutable('2021-11-26 01:02:03'),
         ], UserDto::class);
     }
 
@@ -59,6 +65,7 @@ class SimpleHydratorTest extends TestCase
         $hydrator->hydrate([
             'id' => 1,
             'name' => 'user #1',
+            'created_at' => new \DateTimeImmutable('2021-11-26 01:02:03'),
         ], 'Smelesh\\ResultSetMapper\\Tests\\Fixtures\\UnknownTargetDto');
     }
 
@@ -75,6 +82,7 @@ class SimpleHydratorTest extends TestCase
         $hydrator->hydrate([
             'id' => 1,
             'name' => 'user #1',
+            'created_at' => new \DateTimeImmutable('2021-11-26 01:02:03'),
         ], NotHydratableDto::class);
     }
 
@@ -92,6 +100,7 @@ class SimpleHydratorTest extends TestCase
         $hydrator->hydrate([
             'id' => 1,
             'name' => 'user #1',
+            'created_at' => new \DateTimeImmutable('2021-11-26 01:02:03'),
         ], HydrateToWrongTargetDto::class);
     }
 }

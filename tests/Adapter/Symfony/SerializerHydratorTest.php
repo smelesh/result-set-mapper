@@ -7,6 +7,8 @@ namespace Smelesh\ResultSetMapper\Tests\Adapter\Symfony;
 use Smelesh\ResultSetMapper\Adapter\Symfony\SerializerHydrator;
 use PHPUnit\Framework\TestCase;
 use Smelesh\ResultSetMapper\Tests\Fixtures\UserDto;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -20,9 +22,14 @@ class SerializerHydratorTest extends TestCase
         $result = $hydrator->hydrate([
             'id' => '1',
             'name' => 'user #1',
+            'created_at' => '2021-11-26 01:02:03',
         ], UserDto::class);
 
-        $this->assertEquals(new UserDto(1, 'user #1'), $result);
+        $this->assertEquals(new UserDto(
+            1,
+            'user #1',
+            new \DateTimeImmutable('2021-11-26 01:02:03'),
+        ), $result);
     }
 
     public function testHydrateWithIncompatibleInputData(): void
@@ -36,13 +43,15 @@ class SerializerHydratorTest extends TestCase
         $hydrator->hydrate([
             'id' => new \DateTimeImmutable(),
             'name' => 'user #1',
+            'created_at' => '2021-11-26 01:02:03',
         ], UserDto::class);
     }
 
     private function createSerializer(): Serializer
     {
-        $normalizer = new PropertyNormalizer();
-
-        return new Serializer([$normalizer]);
+        return new Serializer([
+            new DateTimeNormalizer(),
+            new PropertyNormalizer(null, new CamelCaseToSnakeCaseNameConverter()),
+        ]);
     }
 }

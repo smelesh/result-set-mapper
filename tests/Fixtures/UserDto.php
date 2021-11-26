@@ -11,13 +11,14 @@ final class UserDto implements Hydratable
     public function __construct(
         public int $id,
         public string $name,
+        public \DateTimeImmutable $createdAt,
     ) {
     }
 
     public static function hydrate(array $data): self
     {
-        /** @var array{id: int, name: string} $data */
+        /** @var array{id: int, name: string, created_at: string} $data */
 
-        return new self($data['id'], $data['name']);
+        return new self($data['id'], $data['name'], new \DateTimeImmutable($data['created_at']));
     }
 }
