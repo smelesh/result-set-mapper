@@ -20,6 +20,7 @@
     "require-dev": {
         "doctrine/dbal": "^2.12|^3.0",
         "phpunit/phpunit": "^9.5",
+        "symfony/serializer": "^4.4|^5.0",
         "vimeo/psalm": "^4.11"
     },
     "autoload": {
